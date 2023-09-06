@@ -1,19 +1,12 @@
+from PIL import Image, ImageTk
 import tkinter as tk
 import tkinter.filedialog as fd
+import os
+from tkcalendar import Calendar, DateEntry
 
-def soumettre_template(numero_telephone, nom_prenom, localisation, hostname, description):
-    # Ouvrir le fichier en mode écriture
-    fichier = open("C:\\Users\\Josy\\Documents\\test projet python\\questionnaire\\questionnaire\\questionnaire\\resultat_template\\template.txt", "w")
-    # Écrire les informations dans le fichier
-    fichier.write(f"NOM Prénom : {nom_prenom}\n")
-    fichier.write(f"N° de téléphone : {numero_telephone}\n")
-    fichier.write(f"Localisation : {localisation}\n")
-    fichier.write(f"Hostname du poste : {hostname}\n")
-    fichier.write(f"Description de l'incident : {description}\n")
-    # Fermer le fichier
-    fichier.close()
-    # Afficher le message de confirmation
-    label_message.config(text=f"Votre fichier a bien été créé ! Voici la localisation : C:\\Users\\Josy\\Documents\\test projet python\\questionnaire\\questionnaire\\questionnaire\\resultat_template\\template.txt")
+
+dossier = "C:\\Users\\Josy\\Documents\\test projet python\\questionnaire\\questionnaire\\questionnaire\\resultat_template\\"
+texte = "Image chargée avec succès"
 
 def afficher_apercu(description):
     # Créer la fenêtre secondaire
@@ -32,12 +25,70 @@ def afficher_apercu(description):
     bouton_mettre_a_jour = tk.Button(fenetre_apercu, text="Mettre à jour", command=lambda: mettre_a_jour(text_apercu.get("1.0", tk.END)))
     bouton_mettre_a_jour.pack()
 
-
 def mettre_a_jour(nouvelle_description):
     # Effacer le texte du champ "description" dans la fenêtre principale
     entry_description.delete(0, tk.END)
     # Insérer le nouveau texte du champ "description" dans la fenêtre principale
     entry_description.insert(0, nouvelle_description)
+
+def choisir_image():
+    # Ouvrir la boîte de dialogue pour choisir une image
+    chemin = fd.askopenfilename(title="Choisir une image", filetypes=[("Fichiers PNG", ".png"), ("Fichiers JPEG", ".jpg")])
+    # Charger l'image si un chemin est renvoyé
+    if chemin:
+        charger_image(chemin)
+
+def charger_image(chemin):
+    # Ouvrir l'image avec PIL et la convertir en objet tkinter
+    image = Image.open(chemin)
+    photo = ImageTk.PhotoImage(image)
+    # Redimensionner l'image si elle est trop grande
+    largeur_max = 300
+    hauteur_max = 300
+    if photo.width() > largeur_max or photo.height() > hauteur_max:
+        ratio = min(largeur_max / photo.width(), hauteur_max / photo.height())
+        nouvelle_largeur = int(photo.width() * ratio)
+        nouvelle_hauteur = int(photo.height() * ratio)
+        image = image.resize((nouvelle_largeur, nouvelle_hauteur))
+        photo = ImageTk.PhotoImage(image)
+        
+
+
+    # Sauvegarder l'image dans le dossier
+    nom_fichier = os.path.basename(chemin) # Récupérer le nom de l'image choisie
+    image.save(dossier + nom_fichier) # Sauvegarder l'image dans le dossier avec le même nom
+    
+
+
+
+def afficher_image(photo):
+    # Créer un label pour afficher l'image
+    global label_image
+    label_image = tk.Label(fenetre, image=photo)
+    label_image.photo = photo # Garder une référence de l'image
+    label_image.grid(row=7, column=0, columnspan=3) # Placer le label_image dans la grille
+    # Modifier le texte du label_message
+    label_message.config(text=texte)
+    label_message.grid(row=8, column=0, columnspan=3) # Placer le label_message dans la grille
+    
+
+    
+def soumettre_template(date, label_heure, numero_telephone, nom_prenom, localisation, hostname, description):
+    # Ouvrir le fichier en mode écriture
+    fichier = open("C:\\Users\\Josy\\Documents\\test projet python\\questionnaire\\questionnaire\\questionnaire\\resultat_template\\template.txt", "w")
+    # Écrire les informations dans le fichier
+    fichier.write(f"NOM Prénom : {nom_prenom}\n")
+    fichier.write(f"N° de téléphone : {numero_telephone}\n")
+    fichier.write(f"Localisation : {localisation}\n")
+    fichier.write(f"Hostname du poste : {hostname}\n")
+    fichier.write(f"Description de l'incident : {description}\n")
+    fichier.write(f"Date souhaitée : {date}\n")
+    fichier.write(f"Heure souhaitée : {heure}\n")
+    
+    # Fermer le fichier
+    fichier.close()
+    # Afficher le message de confirmation
+    label_message.config(text=f"Votre fichier a bien été créé !\n Voici la localisation : D:\Incident\n Merci de communiquer les fichiers contenus dans le dossier au technicien")
     
 
 
@@ -71,19 +122,47 @@ label_description.grid(row=4, column=0)
 entry_description = tk.Entry(fenetre)
 entry_description.grid(row=4, column=1)
 
+# Créer un label pour afficher la date souhaitée
+label_date = tk.Label(fenetre, text="Date souhaitée pour le RDV téléphonique :")
+label_date.grid(row=5, column=0)
+label_date = tk.Entry(fenetre)
+label_date.grid(row=5, column=3)
+
+# Créer un widget DateEntry pour choisir une date
+date.entry = DateEntry(fenetre, width=12, background='darkblue', foreground='white', borderwidth=2)
+date.entry.grid(row=5, column=1)
+
+# Créer un label pour afficher l'heure souhaitée
+
+label_heure = tk.Label(fenetre, text="4. Heure souhaitée :")
+label_heure.grid(row=5, column=2)
+label_heure.entry = tk.Entry(fenetre)
+label_heure.entry.grid(row=4, column=1)
+
+
 
 
 # Créer le bouton pour soumettre le template
-bouton = tk.Button(fenetre, text="Soumettre le template", command=lambda: soumettre_template(entry_nom_prenom.get(), entry_numero_telephone.get(), entry_localisation.get(), entry_hostname.get(), entry_description.get()))
-bouton.grid(row=5, column=0, columnspan=2)
+bouton = tk.Button(fenetre, text="Soumettre le template", command=lambda: soumettre_template(date_entry.get(), label_heure.get(), entry_nom_prenom.get(), entry_numero_telephone.get(), entry_localisation.get(), entry_hostname.get(), entry_description.get()))
+bouton.grid(row=7, column=0, columnspan=2)
+
+
+
+
+
+
 
 # Créer le label pour afficher le message de confirmation
 label_message = tk.Label(fenetre, text="")
-label_message.grid(row=6, column=0, columnspan=2)
+label_message.grid(row=9, column=0, columnspan=2)
 
 # Créer le bouton pour afficher l'aperçu
-bouton_apercu = tk.Button(fenetre, text="Aperçu", command=lambda: afficher_apercu(entry_description.get()))
+bouton_apercu = tk.Button(fenetre, text="<-- Aperçu", command=lambda: afficher_apercu(entry_description.get()))
 bouton_apercu.grid(row=4, column=2)
+
+# Créer le bouton pour insérer une capture d'écran
+bouton_image = tk.Button(fenetre, text="Insérer une capture d'écran", command=choisir_image)
+bouton_image.grid(row=8, column=0, columnspan=2)
 
 
 # Lancer la boucle principale
