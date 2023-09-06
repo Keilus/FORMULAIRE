@@ -1,153 +1,90 @@
-# Importer le module tkinter
 import tkinter as tk
+import tkinter.filedialog as fd
+
+def soumettre_template(numero_telephone, nom_prenom, localisation, hostname, description):
+    # Ouvrir le fichier en mode écriture
+    fichier = open("C:\\Users\\Josy\\Documents\\test projet python\\questionnaire\\questionnaire\\questionnaire\\resultat_template\\template.txt", "w")
+    # Écrire les informations dans le fichier
+    fichier.write(f"NOM Prénom : {nom_prenom}\n")
+    fichier.write(f"N° de téléphone : {numero_telephone}\n")
+    fichier.write(f"Localisation : {localisation}\n")
+    fichier.write(f"Hostname du poste : {hostname}\n")
+    fichier.write(f"Description de l'incident : {description}\n")
+    # Fermer le fichier
+    fichier.close()
+    # Afficher le message de confirmation
+    label_message.config(text=f"Votre fichier a bien été créé ! Voici la localisation : C:\\Users\\Josy\\Documents\\test projet python\\questionnaire\\questionnaire\\questionnaire\\resultat_template\\template.txt")
+
+def afficher_apercu(description):
+    # Créer la fenêtre secondaire
+    fenetre_apercu = tk.Toplevel(fenetre)
+    fenetre_apercu.title("Aperçu")
+    # Créer le champ modifiable avec le texte du champ "description"
+    text_apercu = tk.Text(fenetre_apercu)
+    text_apercu.insert(tk.END, description)
+    # Dimensionner le champ selon la longueur du texte
+    text_apercu.config(width=50, wrap=tk.WORD)
+    text_apercu.pack()
+    # Créer le bouton "fermer" qui ferme la fenêtre secondaire
+    bouton_fermer = tk.Button(fenetre_apercu, text="Fermer", command=fenetre_apercu.destroy)
+    bouton_fermer.pack()
+    # Créer le bouton "mettre à jour" qui met à jour le texte du champ "description" dans la fenêtre principale
+    bouton_mettre_a_jour = tk.Button(fenetre_apercu, text="Mettre à jour", command=lambda: mettre_a_jour(text_apercu.get("1.0", tk.END)))
+    bouton_mettre_a_jour.pack()
 
 
-# Créer une variable globale pour stocker la référence à la fenêtre d'aperçu
-fenetre_apercu = None
+def mettre_a_jour(nouvelle_description):
+    # Effacer le texte du champ "description" dans la fenêtre principale
+    entry_description.delete(0, tk.END)
+    # Insérer le nouveau texte du champ "description" dans la fenêtre principale
+    entry_description.insert(0, nouvelle_description)
+    
 
 
-# Créer une fonction qui affiche un aperçu du texte si la case est cochée
-def apercu(event):
-    # Déclarer la variable globale fenetre_apercu
-    global fenetre_apercu
-    # Déclarer la variable globale label_apercu
-    global label_apercu
-
-    # Vérifier si la case est cochée
-    if var_apercu.get() == 1:
-        # Récupérer le texte saisi dans le champ Description
-        texte = text_desc.get("1.0", "end")
-        # Vérifier si la fenêtre d'aperçu existe
-        if fenetre_apercu is None:
-            # Créer une nouvelle fenêtre
-            fenetre_apercu = tk.Toplevel(fenetre)
-            # Créer un label avec le texte
-            label_apercu = tk.Label(fenetre_apercu, text=texte)
-            # Placer le label dans la fenêtre
-            label_apercu.pack()
-        else:
-            # Mettre à jour le texte du label
-            label_apercu.config(text=texte)
-        # Récupérer la position de la souris
-        x = fenetre.winfo_pointerx()
-        y = fenetre.winfo_pointery()
-        # Placer la fenêtre d'aperçu à côté de la souris
-        fenetre_apercu.geometry(f"+{x+10}+{y+10}")
-        # Appeler la fonction apercu après 100 millisecondes
-        fenetre.after(100, apercu, event)
-
-# Créer une fonction qui change le texte de la case à cocher selon son état
-def changer_texte():
-    # Vérifier si la case est cochée
-    if var_apercu.get() == 1:
-        # Changer le texte de la case à cocher en "Aperçu activé"
-        check_apercu.config(text="Aperçu activé")
-    else:
-        # Changer le texte de la case à cocher en "Aperçu désactivé"
-        check_apercu.config(text="Aperçu désactivé")
-
-# Créer une fonction qui ferme la fenêtre d'aperçu si elle existe
-def fermer_apercu(event):
-    # Déclarer la variable globale fenetre_apercu
-    global fenetre_apercu
-    # Vérifier si la fenêtre d'aperçu existe
-    if fenetre_apercu is not None:
-        # Détruire la fenêtre d'aperçu
-        fenetre_apercu.destroy()
-        # Mettre la variable fenetre_apercu à None
-        fenetre_apercu = None
-        
-
-
-
-
-# Créer une fenêtre principale
+# Créer l'interface graphique
 fenetre = tk.Tk()
+fenetre.title("Questionnaire")
 
-# Créer un label avec le texte "NOM Prénom"
-label_nom_prenom = tk.Label(fenetre, text="NOM Prénom")
-# Placer le label dans la fenêtre
+# Créer les champs pour saisir les informations
+label_nom_prenom = tk.Label(fenetre, text=" NOM Prénom : ")
 label_nom_prenom.grid(row=0, column=0)
-
-# Créer un champ de saisie pour le nom et le prénom
 entry_nom_prenom = tk.Entry(fenetre)
-# Placer le champ dans la fenêtre
 entry_nom_prenom.grid(row=0, column=1)
 
-# Créer un label avec le texte "N° de téléphone"
-label_tel = tk.Label(fenetre, text="N° de téléphone")
-# Placer le label dans la fenêtre
-label_tel.grid(row=1, column=0)
+label_numero_telephone = tk.Label(fenetre, text="1. N° de téléphone : ")
+label_numero_telephone.grid(row=1, column=0)
+entry_numero_telephone = tk.Entry(fenetre)
+entry_numero_telephone.grid(row=1, column=1)
 
-# Créer un champ de saisie pour le numéro de téléphone
-entry_tel = tk.Entry(fenetre)
-# Placer le champ dans la fenêtre
-entry_tel.grid(row=1, column=1)
+label_localisation = tk.Label(fenetre, text="2. Localisation :")
+label_localisation.grid(row=2, column=0)
+entry_localisation = tk.Entry(fenetre)
+entry_localisation.grid(row=2, column=1)
 
-# Créer un label avec le texte "Localisation"
-label_loc = tk.Label(fenetre, text="Localisation")
-# Placer le label dans la fenêtre
-label_loc.grid(row=2, column=0)
+label_hostname = tk.Label(fenetre, text="3. Hostname du poste :")
+label_hostname.grid(row=3, column=0)
+entry_hostname = tk.Entry(fenetre)
+entry_hostname.grid(row=3, column=1)
 
-# Créer un champ de saisie pour la localisation
-entry_loc = tk.Entry(fenetre)
-# Placer le champ dans la fenêtre
-entry_loc.grid(row=2, column=1)
+label_description = tk.Label(fenetre, text="4. Description de l'incident :")
+label_description.grid(row=4, column=0)
+entry_description = tk.Entry(fenetre)
+entry_description.grid(row=4, column=1)
 
-# Créer une variable pour stocker l'état de la case à cocher Télétravail
-var_tel = tk.IntVar()
 
-# Créer une case à cocher avec le texte "Télétravail"
-check_tel = tk.Checkbutton(fenetre, text="Télétravail", variable=var_tel)
-# Placer la case à cocher dans la fenêtre sous le champ Localisation
-check_tel.grid(row=3, column=0)
 
-# Créer un label avec le texte "Hostname du poste"
-label_host = tk.Label(fenetre, text="Hostname du poste")
-# Placer le label dans la fenêtre sous la case à cocher Télétravail
-label_host.grid(row=4, column=0)
+# Créer le bouton pour soumettre le template
+bouton = tk.Button(fenetre, text="Soumettre le template", command=lambda: soumettre_template(entry_nom_prenom.get(), entry_numero_telephone.get(), entry_localisation.get(), entry_hostname.get(), entry_description.get()))
+bouton.grid(row=5, column=0, columnspan=2)
 
-# Créer un champ de saisie pour l'hostname du poste
-entry_host = tk.Entry(fenetre)
-# Placer le champ dans la fenêtre sous le label Hostname du poste
-entry_host.grid(row=4, column=1)
+# Créer le label pour afficher le message de confirmation
+label_message = tk.Label(fenetre, text="")
+label_message.grid(row=6, column=0, columnspan=2)
 
-# Créer un label avec le texte "Description"
-label_desc = tk.Label(fenetre, text="Description")
-# Placer le label dans la fenêtre sous le champ Hostname du poste
-label_desc.grid(row=5, column=0)
+# Créer le bouton pour afficher l'aperçu
+bouton_apercu = tk.Button(fenetre, text="Aperçu", command=lambda: afficher_apercu(entry_description.get()))
+bouton_apercu.grid(row=4, column=2)
 
-# Créer un champ de texte pour la description
-text_desc = tk.Text(fenetre, height=5)
-# Placer le champ dans la fenêtre sous le label Description
-text_desc.grid(row=6, column=0, columnspan=2)
 
-# Créer une variable pour stocker l'état de la case à cocher Aperçu
-var_apercu = tk.IntVar()
-
-# Créer une case à cocher avec le texte "Aperçu désactivé"
-check_apercu = tk.Checkbutton(fenetre, text="Aperçu désactivé", variable=var_apercu, command=changer_texte)
-# Placer la case à cocher dans la fenêtre en haut à droite du champ Description
-check_apercu.grid(row=5, column=2)
-
-# Associer les événements <Enter> et <Leave> au champ de texte Description
-text_desc.bind("<Enter>", apercu)
-text_desc.bind("<Leave>", fermer_apercu)
-
-# Créer un label avec le texte "Actions réalisées"
-label_actions = tk.Label(fenetre, text="Actions réalisées")
-# Placer le label dans la fenêtre sous le champ Description
-label_actions.grid(row=7, column=0)
-
-# Créer un champ de texte pour les actions réalisées
-text_actions = tk.Text(fenetre, height=5)
-# Placer le champ dans la fenêtre sous le label Actions réalisées
-text_actions.grid(row=8, column=0, columnspan=2)
-
-# Créer un bouton avec le texte "Créer le template" et une commande vide
-bouton_template = tk.Button(fenetre, text="Créer le template", command=lambda: None)
-# Placer le bouton dans la fenêtre en bas au centre
-bouton_template.grid(row=9, column=1)
-
-# Lancer la boucle principale de tkinter
+# Lancer la boucle principale
 fenetre.mainloop()
